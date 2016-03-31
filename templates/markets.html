@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+<title>FactionView Markets &mdash; S&P 500 Market Structure</title>
+<link rel="stylesheet" type="text/css" href="static/style.css">
+<link href='//fonts.googleapis.com/css?family=Noto+Sans' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+
+<table width="100%">
+<tr>
+  <td><p style="margin: 0px;"><b style="font-size: 16pt;">FactionView Markets</b> &mdash; S&P 500 Market Structure (past year, last updated on {{date}})</p></td>
+  <td align="right"><p style="margin: 0px;">&copy; 2016 <a href="..">FactionView</a></p></td>
+</tr>
+</table>
+
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script>
+
+var margin = {top: 30, right: 40, bottom: 30, left: 40},
+    width = window.innerWidth - margin.left - margin.right - 10,
+    height = window.innerHeight - margin.top - margin.bottom - 60;
+
+var x = d3.scale.linear()
+    .range([0, width]);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var color = d3.scale.category10();
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+var tooltip = d3.select("body")
+    .append("div")
+    .style("position", "absolute")
+    .style("z-index", "10")
+    .style("visibility", "hidden")
+    .style("background-color", d3.rgb(255,255,255))
+    .style("padding", "10px")
+    .style("border-radius", "10px")
+    .style("border-width", "1px")
+    .style("border-style", "solid");
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var nodes = {};
+
+drawScatter();
+
+
+function drawScatter()
+{
+  d3.selectAll('.dot').remove();
+  d3.selectAll('.year').remove();
+  d3.selectAll('line').remove();
+
+  d3.csv('static/data/data.csv', function(error, data) {
+
+    console.log(data[0]['date'])
+
+    data.forEach(function(d, i) {
+
+      d.x = +d.x;
+      d.y = +d.y;
+
+      nodes[i] = [d.x, d.y];
+
+    });
+
+  x.domain(d3.extent(data, function(d) { return d.x; })).nice();
+  y.domain(d3.extent(data, function(d) { return d.y; })).nice();
+
+  svg.selectAll(".dot")
+    .data(data)
+    .enter().append("circle")
+    .attr("class", "dot")
+    .attr("r", function(d) { return Math.sqrt(d['Market Cap'])/2.5;}) 
+    .attr("cx", function(d) { return x(d.x); })
+    .attr("cy", function(d) { return y(d.y); })
+    .style("fill", function(d) 
+    {
+      var color = d3.scale.category10().domain([
+        'Industrials',
+        'Materials',
+        'Energy',
+        'Utilities',
+        'Health Care',
+        'Consumer Staples',
+        'Consumer Discretionary',
+        'Telecommunication Services',
+        'Information Technology',
+        'Financials'
+        ]);
+
+      return color(d['Sector']);
+
+    })
+    .on("mouseover", function(){return tooltip.style("visibility", "visible");})
+    .on("mousemove", function(d){return tooltip
+      .html(
+        "<h1>" + d["Name"] + " (" + d["Symbol"] + ")" + "</h1>" +
+        "<p>" + d["Sector"] + "</p>" +
+        "<p>" + "Market Cap: $" + parseFloat(d["Market Cap"]).toFixed(0) + " billion" + "</p>"
+        )
+      .style("top", (d3.event.pageY-10)+"px")
+      .style("left", (d3.event.pageX+10)+"px");})
+    .on("mouseout", function(){return tooltip.style("visibility", "hidden");})
+  });
+}
+
+</script>

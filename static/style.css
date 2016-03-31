@@ -1,0 +1,23 @@
+body 
+{
+	font-family: 'Noto Sans', sans-serif;
+}
+
+.axis path,
+.axis line 
+{
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges;
+}
+
+.dot 
+{
+	stroke: #000;
+}
+
+h1
+{
+	font-size: 16pt;
+	margin-bottom: 0px;
+}
