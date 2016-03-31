@@ -25,5 +25,3 @@ def markets():
 
 	return render_template('markets.html', date=date_str)
 
-
-app.run()
