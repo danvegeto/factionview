@@ -1,3 +1,4 @@
+import os
 import pandas
 from dateutil.parser import parse
 from flask import Flask, render_template
@@ -17,7 +18,9 @@ def politics():
 @app.route('/markets')
 def markets():
 
-	prices = pandas.read_csv('./static/markets/data/prices.csv')
+	dir_name = os.path.dirname(os.path.realpath(__file__))
+
+	prices = pandas.read_csv(dir_name + '/static/markets/data/prices.csv')
 
 	date_str = prices['date'][0]
 	date = parse(date_str)

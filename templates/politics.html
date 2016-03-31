@@ -2,12 +2,19 @@
 <meta charset='utf-8'>
 
 <head>
-<title></title>
+<title>FactionView Politics &mdash; U.S. Congress Voting Coalition Structure</title>
 <link rel='stylesheet' type='text/css' href='static/style.css'>
 <link href='http://fonts.googleapis.com/css?family=Noto+Sans' rel='stylesheet' type='text/css'>
 </head>
 
 <body>
+
+<table width="100%">
+<tr>
+  <td><p style="margin: 0px;">U.S. Congress Voting Coalition Structure</p></td>
+  <td align="right"><p style="margin: 0px;">&copy; 2016 <a href="..">FactionView</a></p></td>
+</tr>
+</table>
 
 <script src='http://d3js.org/d3.v3.min.js'></script>
 <script>
@@ -16,9 +23,9 @@ var min_congress = 77
 var max_congress = 114
 var congress = min_congress
 
-var margin = {top: 20, right: 20, bottom: 30, left: 40, mid: 20},
+var margin = {top: 20, right: 20, bottom: 20, left: 20, mid: 20},
     width = window.innerWidth - margin.left - margin.right - margin.mid - 10,
-    height = window.innerHeight - margin.top - margin.bottom - 25;
+    height = window.innerHeight - margin.top - margin.bottom - 50;
 
 var x1 = d3.scale.linear()
     .range([0, width/2 - margin.mid/2]);
@@ -76,7 +83,7 @@ function nth(d) {
         case 3:  return 'rd';
         default: return 'th';
     }
-} 
+}
 
 
 var house = {};
@@ -91,8 +98,8 @@ d3.select('body').on('keydown', function()
 {
 
   code = d3.event.keyCode;
-  
-  if(code == 37) 
+
+  if(code == 37)
   {
     congress -= 1;
 
@@ -184,11 +191,11 @@ function drawScatter()
       .data(data)
     .enter().append('circle')
       .attr('class', 'house dot')
-      .attr('r', function(d) { return 3;}) 
+      .attr('r', function(d) { return 3;})
       .attr('cx', function(d) { return x1(d.x); })
       .attr('cy', function(d) { return y1(d.y); })
-      .style('fill', function(d) 
-      { 
+      .style('fill', function(d)
+      {
           if(d['party'] == 'R' || d['party'] == 'Republican')
           {
             //if(isSouthern(d['state']))
@@ -210,7 +217,7 @@ function drawScatter()
       .on('mouseover', function(){return tooltip.style('visibility', 'visible');})
       .on('mousemove', function(d){return tooltip
         .html(
-            '<h1>' + d['name'] + '</h1>' + 
+            '<h1>' + d['name'] + '</h1>' +
             d['party'] + ' - ' + d['state']
             )
         .style('top', (d3.event.pageY-10)+'px')
@@ -238,8 +245,8 @@ function drawScatter()
       .attr('r', function(d) { return 5;}) //Math.sqrt(d['t']) / 400.0;})
       .attr('cx', function(d) { return x2(d.x); })
       .attr('cy', function(d) { return y2(d.y); })
-      .style('fill', function(d) 
-      { 
+      .style('fill', function(d)
+      {
           if(d['party'] == 'R' || d['party'] == 'Republican')
           {
             //if(isSouthern(d['state']))
@@ -261,7 +268,7 @@ function drawScatter()
       .on('mouseover', function(){return tooltip.style('visibility', 'visible');})
       .on('mousemove', function(d){return tooltip
         .html(
-            '<h1>' + d['name'] + '</h1>' + 
+            '<h1>' + d['name'] + '</h1>' +
             d['party'] + ' - ' + d['state']
             )
         .style('top', (d3.event.pageY-10)+'px')
@@ -297,7 +304,7 @@ function drawLinks()
         .attr('y1', yi)
         .attr('x2', xj)
         .attr('y2', yj);
-      
+
     });
 
   });
@@ -322,7 +329,7 @@ function drawLinks()
         .attr('y1', yi)
         .attr('x2', xj)
         .attr('y2', yj);
-      
+
     });
 
   });

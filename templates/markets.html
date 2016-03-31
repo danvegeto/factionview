@@ -11,7 +11,7 @@
 
 <table width="100%">
 <tr>
-  <td><p style="margin: 0px;"><b style="font-size: 16pt;">FactionView Markets</b> &mdash; S&P 500 Market Structure (past year, last updated on {{date}})</p></td>
+  <td><p style="margin: 0px;">S&P 500 Market Structure (past year, last updated on {{date}})</p></td>
   <td align="right"><p style="margin: 0px;">&copy; 2016 <a href="..">FactionView</a></p></td>
 </tr>
 </table>
@@ -87,10 +87,10 @@ function drawScatter()
     .data(data)
     .enter().append("circle")
     .attr("class", "dot")
-    .attr("r", function(d) { return Math.sqrt(d['Market Cap'])/2.5;}) 
+    .attr("r", function(d) { return Math.sqrt(d['Market Cap'])/2.5;})
     .attr("cx", function(d) { return x(d.x); })
     .attr("cy", function(d) { return y(d.y); })
-    .style("fill", function(d) 
+    .style("fill", function(d)
     {
       var color = d3.scale.category10().domain([
         'Industrials',
