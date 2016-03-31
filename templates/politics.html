@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<meta charset='utf-8'>
+
+<head>
+<title></title>
+<link rel='stylesheet' type='text/css' href='static/style.css'>
+<link href='http://fonts.googleapis.com/css?family=Noto+Sans' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+
+<script src='http://d3js.org/d3.v3.min.js'></script>
+<script>
+
+var min_congress = 77
+var max_congress = 114
+var congress = min_congress
+
+var margin = {top: 20, right: 20, bottom: 30, left: 40, mid: 20},
+    width = window.innerWidth - margin.left - margin.right - margin.mid - 10,
+    height = window.innerHeight - margin.top - margin.bottom - 25;
+
+var x1 = d3.scale.linear()
+    .range([0, width/2 - margin.mid/2]);
+
+var x2 = d3.scale.linear()
+    .range([width/2 + margin.mid/2, width]);
+
+var y1 = d3.scale.linear()
+    .range([height, 0]);
+
+var y2 = d3.scale.linear()
+    .range([height, 0]);
+
+var color = d3.scale.category10();
+
+var x1Axis = d3.svg.axis()
+    .scale(x1)
+    .orient('bottom');
+
+var x2Axis = d3.svg.axis()
+    .scale(x2)
+    .orient('bottom');
+
+var y1Axis = d3.svg.axis()
+    .scale(y1)
+    .orient('left');
+
+var y2Axis = d3.svg.axis()
+    .scale(y2)
+    .orient('left');
+
+var tooltip = d3.select('body')
+    .append('div')
+    .style('position', 'absolute')
+    .style('z-index', '10')
+    .style('visibility', 'hidden')
+    .style('background-color', d3.rgb(255,255,255))
+    .style('padding', '10px')
+    .style('border-radius', '10px')
+    .style('border-width', '1px')
+    .style('border-style', 'solid');
+
+var svg = d3.select('body').append('svg')
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.top + margin.bottom)
+  .append('g')
+    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+
+function nth(d) {
+  if(d%100>3 && d%100<21) return 'th';
+  switch (d % 10) {
+        case 1:  return 'st';
+        case 2:  return 'nd';
+        case 3:  return 'rd';
+        default: return 'th';
+    }
+} 
+
+
+var house = {};
+var senate = {};
+
+drawText();
+drawScatter();
+
+
+
+d3.select('body').on('keydown', function()
+{
+
+  code = d3.event.keyCode;
+  
+  if(code == 37) 
+  {
+    congress -= 1;
+
+    if(congress < min_congress)
+      congress = max_congress;
+
+    drawScatter();
+  }
+  else if(code == 39)
+  {
+    congress += 1;
+
+    if(congress > max_congress)
+      congress = min_congress;
+
+    drawScatter();
+  }
+
+});
+
+function isSouthern(state)
+{
+  return ['AL', 'AK', 'FL', 'GA', 'KY', 'LA', 'MD', 'MN', 'MO', 'MS', 'NC', 'SC', 'TN', 'TX', 'VA', ].indexOf(state) > -1;
+}
+
+
+function drawText()
+{
+    svg.append('rect')
+    .attr('x', width/2)
+    .attr('y', 0)
+    .attr('width', 1)
+    .attr('height', height);
+
+  svg.append('text')
+    .attr('x', width-300)
+    .attr('y', 0)
+    .text('use left and right arrows to change years');
+
+  svg.append('text')
+    .attr('x', width-265)
+    .attr('y', 20)
+    .text('mouse-over or click for more info');
+
+
+  svg.append('text')
+    .attr('x', 0)
+    .attr('y', height)
+    .text('House of Representatives');
+
+  svg.append('text')
+    .attr('x', width/2 + margin.mid/2)
+    .attr('y', height)
+    .text('Senate');
+}
+
+
+function drawScatter()
+{
+  d3.selectAll('.dot').remove();
+  d3.selectAll('.year').remove();
+  d3.selectAll('line').remove();
+
+  if(congress > max_congress)
+    congress = min_congress;
+
+
+  var year = 1941 + (congress - 77)*2
+  d3.select('g').append('text').attr('class', 'year').text(congress + nth(congress) + ' Congress (' + year + '-' + (year+1) + ')');
+
+
+
+  d3.tsv('static/politics/data/' + congress + '.h.tsv', function(error, data) {
+    data.forEach(function(d, i) {
+
+      d.x = +d.x;
+      d.y = +d.y;
+
+      house[i] = [d.x, d.y];
+
+    });
+
+  x1.domain(d3.extent(data, function(d) { return d.x; })).nice();
+  y1.domain(d3.extent(data, function(d) { return d.y; })).nice();
+
+  //drawLinks();
+
+  svg.selectAll('.house.dot')
+      .data(data)
+    .enter().append('circle')
+      .attr('class', 'house dot')
+      .attr('r', function(d) { return 3;}) 
+      .attr('cx', function(d) { return x1(d.x); })
+      .attr('cy', function(d) { return y1(d.y); })
+      .style('fill', function(d) 
+      { 
+          if(d['party'] == 'R' || d['party'] == 'Republican')
+          {
+            //if(isSouthern(d['state']))
+            //  return d3.rgb(255,128,128);
+            //else
+              return d3.rgb(255,0,0);
+          }
+          else if(d['party'] == 'D' || d['party'] == 'Democrat')
+          {
+            if(isSouthern(d['state']))
+              return d3.rgb(180,180,255);
+            else
+              return d3.rgb(0,0,255);
+          }
+          else
+            return d3.rgb(0,255,0);
+      })
+      //.style('opacity', 0.66)
+      .on('mouseover', function(){return tooltip.style('visibility', 'visible');})
+      .on('mousemove', function(d){return tooltip
+        .html(
+            '<h1>' + d['name'] + '</h1>' + 
+            d['party'] + ' - ' + d['state']
+            )
+        .style('top', (d3.event.pageY-10)+'px')
+        .style('left', (d3.event.pageX+10)+'px');})
+      .on('mouseout', function(){return tooltip.style('visibility', 'hidden');})
+      .on('click', function(d){window.open('https://www.govtrack.us/congress/members/' + d['id']);});
+
+    });
+
+  d3.tsv('static/politics/data/' + congress + '.s.tsv', function(error, data) {
+    data.forEach(function(d, i) {
+      d.x = +d.x;
+      d.y = +d.y;
+
+      senate[i] = [d.x, d.y];
+    });
+
+  x2.domain(d3.extent(data, function(d) { return d.x; })).nice();
+  y2.domain(d3.extent(data, function(d) { return d.y; })).nice();
+
+  svg.selectAll('.senate.dot')
+      .data(data)
+    .enter().append('circle')
+      .attr('class', 'senate dot')
+      .attr('r', function(d) { return 5;}) //Math.sqrt(d['t']) / 400.0;})
+      .attr('cx', function(d) { return x2(d.x); })
+      .attr('cy', function(d) { return y2(d.y); })
+      .style('fill', function(d) 
+      { 
+          if(d['party'] == 'R' || d['party'] == 'Republican')
+          {
+            //if(isSouthern(d['state']))
+            //  return d3.rgb(255,128,128);
+            //else
+              return d3.rgb(255,0,0);
+          }
+          else if(d['party'] == 'D' || d['party'] == 'Democrat')
+          {
+            if(isSouthern(d['state']))
+              return d3.rgb(180,180,255);
+            else
+              return d3.rgb(0,0,255);
+          }
+          else
+            return d3.rgb(0,255,0);
+      })
+      //.style('opacity', 0.66)
+      .on('mouseover', function(){return tooltip.style('visibility', 'visible');})
+      .on('mousemove', function(d){return tooltip
+        .html(
+            '<h1>' + d['name'] + '</h1>' + 
+            d['party'] + ' - ' + d['state']
+            )
+        .style('top', (d3.event.pageY-10)+'px')
+        .style('left', (d3.event.pageX+10)+'px');})
+      .on('mouseout', function(){return tooltip.style('visibility', 'hidden');})
+      .on('click', function(d){window.open('https://www.govtrack.us/congress/members/' + d['id']);});
+
+    });
+}
+
+function drawLinks()
+{
+
+  var links = svg.append('g');
+
+  d3.tsv(congress + '.h.links.tsv', function(error, data) {
+
+    data.forEach(function(d) {
+      var i = +d['i'];
+      var j = +d['j'];
+      var val = +d['val'];
+
+      var xi = x1(house[i][0]);
+      var yi = y1(house[i][1]);
+      var xj = x1(house[j][0]);
+      var yj = y1(house[j][1]);
+
+      links.append('line')
+        .style('opacity', 1-val)
+        .attr('stroke-width', 1)
+        .attr('stroke', 'rgb(64,64,64)')
+        .attr('x1', xi)
+        .attr('y1', yi)
+        .attr('x2', xj)
+        .attr('y2', yj);
+      
+    });
+
+  });
+
+  d3.tsv(congress + '.s.links.tsv', function(error, data) {
+
+    data.forEach(function(d) {
+      var i = +d['i'];
+      var j = +d['j'];
+      var val = +d['val'];
+
+      var xi = x2(senate[i][0]);
+      var yi = y2(senate[i][1]);
+      var xj = x2(senate[j][0]);
+      var yj = y2(senate[j][1]);
+
+      links.append('line')
+        .style('opacity', 1-val)
+        .attr('stroke-width', 1)
+        .attr('stroke', 'rgb(64,64,64)')
+        .attr('x1', xi)
+        .attr('y1', yi)
+        .attr('x2', xj)
+        .attr('y2', yj);
+      
+    });
+
+  });
+
+}
+
+</script>
