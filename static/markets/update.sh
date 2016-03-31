@@ -1,5 +1,5 @@
 set -v
-mkdir static/data
+mkdir data
 python download.py
 python get_correlations.py
 python reduce.py

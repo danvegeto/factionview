@@ -1,6 +1,6 @@
 import pandas
 
-rdiffs = pandas.read_csv('static/data/prices.csv', index_col=0)
+rdiffs = pandas.read_csv('data/prices.csv', index_col=0)
 
 rdiffs = rdiffs.drop('date', 1)
 
@@ -22,4 +22,4 @@ for i in range(n):
 
 df = pandas.DataFrame(corr, index=rdiffs.columns, columns=rdiffs.columns).fillna(0)
 
-df.to_csv('static/data/correlations.csv')
+df.to_csv('data/correlations.csv')

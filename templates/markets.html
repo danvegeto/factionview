@@ -67,7 +67,7 @@ function drawScatter()
   d3.selectAll('.year').remove();
   d3.selectAll('line').remove();
 
-  d3.csv('static/data/data.csv', function(error, data) {
+  d3.csv('static/markets/data/data.csv', function(error, data) {
 
     console.log(data[0]['date'])
 

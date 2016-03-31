@@ -167,10 +167,10 @@ def tsne(X = Math.array([]), no_dims = 2, initial_dims = 50, perplexity = 30.0):
 
 if __name__ == "__main__":
 	
-	X = pandas.read_csv('static/data/correlations.csv', index_col=0);
+	X = pandas.read_csv('data/correlations.csv', index_col=0);
 
 	Y = tsne(X, 2);
 
 	coordinates = pandas.DataFrame(Y, index=X.index, columns=['x', 'y']);
 
-	coordinates.to_csv('static/data/coordinates.csv');
+	coordinates.to_csv('data/coordinates.csv');
