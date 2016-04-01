@@ -14,7 +14,7 @@ for i in range(n):
 
 	for j in range(n):
 
-		c = rdiffs.ix[:365,i].corr(rdiffs.ix[:365,j])
+		c = rdiffs.ix[:,i].corr(rdiffs.ix[:,j])
 
 		row.append(c)
 
