@@ -16,7 +16,7 @@ for code in companies.index:
 
 	i += 1
 
-	url = 'https://www.quandl.com/api/v1/datasets/WIKI/' + code + '.csv?rows=365&column=4&transformation=rdiff&api_key=msf-SgTxxaB2iDtazzBm'
+	url = 'https://www.quandl.com/api/v1/datasets/WIKI/' + code + '.csv?rows=1095&column=4&transformation=rdiff&api_key=msf-SgTxxaB2iDtazzBm'
 
 	try:
 
